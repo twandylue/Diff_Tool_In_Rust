@@ -1,9 +1,9 @@
-use diff_tool::{compute_lcs_len_dp_chars, diff_chars};
+use diff_tool::{compute_lcs_matrix_dp, diff};
 
 fn main() {
     let new: Vec<char> = String::from("abcdefghi").chars().collect();
     let old: Vec<char> = String::from("azedbcdz").chars().collect();
-    let result = diff_chars(&new, &old);
+    let result = diff(&new, &old);
 
     // print diff
     for i in result {
@@ -11,7 +11,7 @@ fn main() {
     }
 
     // print metrix
-    let r = compute_lcs_len_dp_chars(&new, &old);
+    let r = compute_lcs_matrix_dp(&new, &old);
 
     println!();
 
