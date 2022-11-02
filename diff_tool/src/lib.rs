@@ -150,6 +150,30 @@ mod tests {
 
     #[test]
     fn diff_test_chars_2() {
+        let new: Vec<char> = String::from("abcd").chars().collect();
+        let old: Vec<char> = String::from("").chars().collect();
+        let r = diff_chars(&new, &old);
+
+        let expected = vec!["+a", "+b", "+c", "+d"];
+        for i in 0..r.len() {
+            assert_eq!(r[i], expected[i]);
+        }
+    }
+
+    #[test]
+    fn diff_test_chars_3() {
+        let new: Vec<char> = String::from("").chars().collect();
+        let old: Vec<char> = String::from("abcd").chars().collect();
+        let r = diff_chars(&new, &old);
+
+        let expected = vec!["-a", "-b", "-c", "-d"];
+        for i in 0..r.len() {
+            assert_eq!(r[i], expected[i]);
+        }
+    }
+
+    #[test]
+    fn diff_test_chars_4() {
         let new: Vec<char> = String::from("abecd").chars().collect();
         let old: Vec<char> = String::from("zaabck").chars().collect();
         let r = diff_chars(&new, &old);
