@@ -1,7 +1,3 @@
-// TODO:
-// 1. diff_lines
-// 2. console input args
-
 use ::std::cmp;
 use std::fmt::Display;
 
@@ -209,6 +205,30 @@ mod tests {
         let actual = diff(&new, &old);
 
         let expected = vec!["-He", "is", "Andy"];
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
+        }
+    }
+
+    #[test]
+    fn diff_test_lines_1() {
+        let new: Vec<&str> = vec!["He is Andy", "She is Anne"];
+        let old: Vec<&str> = vec!["He is Andy", "I am Amy"];
+        let actual = diff(&new, &old);
+
+        let expected = vec!["He is Andy", "-I am Amy", "+She is Anne"];
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
+        }
+    }
+
+    #[test]
+    fn diff_test_lines_2() {
+        let new: Vec<&str> = vec!["He is Andy", "I am Amyyy", "She is Anne"];
+        let old: Vec<&str> = vec!["He is Andy", "I am Amy"];
+        let actual = diff(&new, &old);
+
+        let expected = vec!["He is Andy", "-I am Amy", "+I am Amyyy", "+She is Anne"];
         for i in 0..actual.len() {
             assert_eq!(actual[i], expected[i]);
         }

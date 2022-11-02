@@ -1,3 +1,7 @@
+// TODO:
+// 1. console input args
+// 2. combine diff_chars, diff_words and diff_lines
+
 use diff_tool::{compute_lcs_matrix_dp, diff};
 
 fn main() {
