@@ -1,51 +1,52 @@
 use ::std::cmp;
 
-pub struct Diff {
-    addition: Vec<char>,
-    removal: Vec<char>,
-    unchanged: Vec<char>,
-}
+// TODO: still working...
+// pub struct DiffWords {
+//     addition: Vec<String>,
+//     removal: Vec<String>,
+//     unchanged: Vec<String>,
+// }
+//
+// impl DiffWords {
+//     pub fn new() -> Self {
+//         DiffWords {
+//             addition: Vec::new(),
+//             removal: Vec::new(),
+//             unchanged: Vec::new(),
+//         }
+//     }
+// }
 
-impl Diff {
-    pub fn new() -> Self {
-        Diff {
-            addition: Vec::new(),
-            removal: Vec::new(),
-            unchanged: Vec::new(),
-        }
-    }
-}
+// pub fn diff_words(text1: &Vec<&str>, text2: &Vec<char>) -> DiffWords {}
 
-pub fn diff(text1: &Vec<char>, text2: &Vec<char>) -> Diff {
-    let lcs = compute_lcs_len_dp(text1, text2);
-    let mut i = text1.len();
-    let mut j = text2.len();
+pub fn diff_chars(new_text: &Vec<char>, old_text: &Vec<char>) -> Vec<String> {
+    let lcs = compute_lcs_len_dp(new_text, old_text);
+    let mut i = new_text.len();
+    let mut j = old_text.len();
 
-    let mut result = Diff::new();
+    let mut result: Vec<String> = Vec::new();
 
     while i != 0 || j != 0 {
         if i == 0 {
-            result.addition.push(text2[j - 1]);
+            result.push(format!("-{}", old_text[j - 1]));
             j -= 1;
         } else if j == 0 {
-            result.removal.push(text1[i - 1]);
+            result.push(format!("+{}", new_text[i - 1]));
             i -= 1;
-        } else if text1[i - 1] == text2[j - 1] {
-            result.unchanged.push(text1[i - 1]);
+        } else if new_text[i - 1] == old_text[j - 1] {
+            result.push(format!("{}", new_text[i - 1]));
             i -= 1;
             j -= 1;
         } else if lcs[j - 1][i] <= lcs[j][i - 1] {
-            result.addition.push(text1[i - 1]);
+            result.push(format!("+{}", new_text[i - 1]));
             i -= 1;
         } else {
-            result.removal.push(text2[j - 1]);
+            result.push(format!("-{}", old_text[j - 1]));
             j -= 1;
         }
     }
 
-    result.addition.reverse();
-    result.removal.reverse();
-    result.unchanged.reverse();
+    result.reverse();
     return result;
 }
 
@@ -71,13 +72,13 @@ pub fn compute_lcs_string_dp(text1: &Vec<char>, text2: &Vec<char>) -> String {
     return result.chars().rev().collect();
 }
 
-pub fn compute_lcs_len_dp(text1: &Vec<char>, text2: &Vec<char>) -> Vec<Vec<i32>> {
-    let mut result = vec![vec![0; text1.len() + 1]; text2.len() + 1];
-    for i in 0..text2.len() + 1 {
-        for j in 0..text1.len() + 1 {
+pub fn compute_lcs_len_dp(new_text: &Vec<char>, old_text: &Vec<char>) -> Vec<Vec<i32>> {
+    let mut result = vec![vec![0; new_text.len() + 1]; old_text.len() + 1];
+    for i in 0..old_text.len() + 1 {
+        for j in 0..new_text.len() + 1 {
             if i == 0 || j == 0 {
                 result[i][j] = 0;
-            } else if text2[i - 1] == text1[j - 1] {
+            } else if old_text[i - 1] == new_text[j - 1] {
                 result[i][j] = result[i - 1][j - 1] + 1
             } else {
                 result[i][j] = cmp::max(result[i - 1][j], result[i][j - 1])
@@ -136,23 +137,36 @@ mod tests {
     }
 
     #[test]
-    fn diff_test_chars() {
-        let new: Vec<char> = String::from("abcdefghi").chars().collect();
-        let old: Vec<char> = String::from("azedbcz").chars().collect();
-        let r = diff(&new, &old);
+    fn diff_test_chars_1() {
+        let new: Vec<char> = String::from("abcd").chars().collect();
+        let old: Vec<char> = String::from("abc").chars().collect();
+        let r = diff_chars(&new, &old);
 
-        assert_eq!(r.addition.iter().collect::<String>(), "defghi");
-        assert_eq!(r.unchanged.iter().collect::<String>(), "abc");
-        assert_eq!(r.removal.iter().collect::<String>(), "zedz");
+        let expected = vec!["a", "b", "c", "+d"];
+        for i in 0..r.len() {
+            assert_eq!(r[i], expected[i]);
+        }
     }
 
     #[test]
-    fn diff_test_words() {
-        let new: Vec<char> = String::from("This is Andy").chars().collect();
-        let old: Vec<char> = String::from("This is Amy").chars().collect();
-        let r = diff(&new, &old);
+    fn diff_test_chars_2() {
+        let new: Vec<char> = String::from("abecd").chars().collect();
+        let old: Vec<char> = String::from("zaabck").chars().collect();
+        let r = diff_chars(&new, &old);
 
-        assert_eq!(r.addition.iter().collect::<String>(), "nd");
-        assert_eq!(r.removal.iter().collect::<String>(), "m");
+        let expected = vec!["-z", "-a", "a", "b", "+e", "c", "-k", "+d"];
+        for i in 0..r.len() {
+            assert_eq!(r[i], expected[i]);
+        }
     }
+
+    // #[test]
+    // fn diff_test_words() {
+    //     let new: Vec<char> = String::from("This is Andy").chars().collect();
+    //     let old: Vec<char> = String::from("This is Amy").chars().collect();
+    //     let r = diff_chars(&new, &old);
+    //
+    //     // assert_eq!(r.addition.iter().collect::<String>(), "nd");
+    //     // assert_eq!(r.removal.iter().collect::<String>(), "m");
+    // }
 }
