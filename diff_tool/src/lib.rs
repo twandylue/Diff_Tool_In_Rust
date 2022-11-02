@@ -1,3 +1,8 @@
+// TODO:
+// 1. Generic type in diff_words and diff_chars
+// 2. diff_lines
+// 3. console input args
+
 use ::std::cmp;
 
 pub fn diff_words(new_text: &Vec<&str>, old_text: &Vec<&str>) -> Vec<String> {
@@ -214,14 +219,40 @@ mod tests {
     }
 
     #[test]
-    fn diff_test_words() {
-        let new: Vec<&str> = vec!["He", "is", "Andy"];
-        let old: Vec<&str> = vec!["She", "is", "Amy"];
-        let r = diff_words(&new, &old);
+    fn diff_test_words_1() {
+        // let new: Vec<&str> = vec!["He", "is", "Andy"];
+        // let old: Vec<&str> = vec!["She", "is", "Amy"];
+        let new: Vec<&str> = "He is Andy".split(" ").collect();
+        let old: Vec<&str> = "She is Amy".split(" ").collect();
+        let actual = diff_words(&new, &old);
 
         let expected = vec!["-She", "+He", "is", "-Amy", "+Andy"];
-        for i in 0..r.len() {
-            assert_eq!(r[i], expected[i]);
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
+        }
+    }
+
+    #[test]
+    fn diff_test_words_2() {
+        let new: Vec<&str> = "He is Andy".split(" ").collect();
+        let old: Vec<&str> = "He is".split(" ").collect();
+        let actual = diff_words(&new, &old);
+
+        let expected = vec!["He", "is", "+Andy"];
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
+        }
+    }
+
+    #[test]
+    fn diff_test_words_3() {
+        let new: Vec<&str> = "is Andy".split(" ").collect();
+        let old: Vec<&str> = "He is Andy".split(" ").collect();
+        let actual = diff_words(&new, &old);
+
+        let expected = vec!["-He", "is", "Andy"];
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
         }
     }
 }
