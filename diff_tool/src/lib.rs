@@ -1,7 +1,6 @@
 // TODO:
-// 1. Generic type in diff_words and diff_chars
-// 2. diff_lines
-// 3. console input args
+// 1. diff_lines
+// 2. console input args
 
 use ::std::cmp;
 use std::fmt::Display;
