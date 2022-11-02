@@ -136,13 +136,23 @@ mod tests {
     }
 
     #[test]
-    fn diff_test() {
-        let s1: Vec<char> = String::from("abcdefghi").chars().collect();
-        let s2: Vec<char> = String::from("azedbcz").chars().collect();
-        let r = diff(&s1, &s2);
+    fn diff_test_chars() {
+        let new: Vec<char> = String::from("abcdefghi").chars().collect();
+        let old: Vec<char> = String::from("azedbcz").chars().collect();
+        let r = diff(&new, &old);
 
         assert_eq!(r.addition.iter().collect::<String>(), "defghi");
         assert_eq!(r.unchanged.iter().collect::<String>(), "abc");
         assert_eq!(r.removal.iter().collect::<String>(), "zedz");
+    }
+
+    #[test]
+    fn diff_test_words() {
+        let new: Vec<char> = String::from("This is Andy").chars().collect();
+        let old: Vec<char> = String::from("This is Amy").chars().collect();
+        let r = diff(&new, &old);
+
+        assert_eq!(r.addition.iter().collect::<String>(), "nd");
+        assert_eq!(r.removal.iter().collect::<String>(), "m");
     }
 }
