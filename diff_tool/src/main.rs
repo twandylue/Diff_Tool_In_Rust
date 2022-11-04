@@ -14,23 +14,26 @@ fn main() {
     println!("Old file path: {}", config.old_file_path);
     println!("New file path: {}", config.new_file_path);
 
-    if let Ok(content) = Content::read(config) {
-        // NOTE: diff words
-        let result = diff(
-            &content
-                .new_text
-                .split(" ")
-                .map(|x| x.to_string())
-                .collect::<Vec<String>>(),
-            &content
-                .old_text
-                .split(" ")
-                .map(|x| x.to_string())
-                .collect::<Vec<String>>(),
-        );
+    match Content::read(config) {
+        Ok(content) => {
+            // NOTE: diff words
+            let result = diff(
+                &content
+                    .new_text
+                    .split(" ")
+                    .map(|x| x.to_string())
+                    .collect::<Vec<String>>(),
+                &content
+                    .old_text
+                    .split(" ")
+                    .map(|x| x.to_string())
+                    .collect::<Vec<String>>(),
+            );
 
-        println!("diff result: {:?}", result);
-    } else {
-        eprintln!("Application Error.");
+            println!("diff result: {:?}", result);
+        }
+        Err(err) => {
+            eprintln!("Application Error: {err}.");
+        }
     }
 }
