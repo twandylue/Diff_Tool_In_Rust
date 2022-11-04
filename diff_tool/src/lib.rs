@@ -1,5 +1,48 @@
 use ::std::cmp;
-use std::fmt::Display;
+use std::{error::Error, fmt::Display, fs};
+
+pub struct Config {
+    pub new_file_path: String,
+    pub old_file_path: String,
+}
+
+impl Config {
+    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+        args.next();
+
+        let old_file_path = match args.next() {
+            Some(f) => f,
+            None => return Err("Didn't get a old file path."),
+        };
+
+        let new_file_path = match args.next() {
+            Some(f) => f,
+            None => return Err("Didn't get a new file path."),
+        };
+
+        Ok(Config {
+            new_file_path: new_file_path.clone(),
+            old_file_path: old_file_path.clone(),
+        })
+    }
+}
+
+pub struct Content {
+    pub new_text: String,
+    pub old_text: String,
+}
+
+impl Content {
+    pub fn read(config: Config) -> Result<Content, Box<dyn Error>> {
+        let old_content = fs::read_to_string(config.old_file_path)?;
+        let new_content = fs::read_to_string(config.new_file_path)?;
+
+        Ok(Content {
+            new_text: new_content,
+            old_text: old_content,
+        })
+    }
+}
 
 pub fn diff<T>(new_text: &Vec<T>, old_text: &Vec<T>) -> Vec<String>
 where

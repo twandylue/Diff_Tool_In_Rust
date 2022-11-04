@@ -1,42 +1,36 @@
 // TODO:
-// 1. console input args
-// 2. combine diff_chars, diff_words and diff_lines
+// 1. combine diff_chars, diff_words and diff_lines
 
-use diff_tool::{compute_lcs_matrix_dp, diff};
+use std::{env, process};
+
+use diff_tool::{compute_lcs_matrix_dp, diff, Config, Content};
 
 fn main() {
-    let new: Vec<char> = String::from("abcdefghi").chars().collect();
-    let old: Vec<char> = String::from("azedbcdz").chars().collect();
-    let result = diff(&new, &old);
+    let config = Config::build(env::args()).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
 
-    // print diff
-    for i in result {
-        println!("{}", i);
-    }
+    println!("Old file path: {}", config.old_file_path);
+    println!("New file path: {}", config.new_file_path);
 
-    // print metrix
-    let r = compute_lcs_matrix_dp(&new, &old);
+    if let Ok(content) = Content::read(config) {
+        // NOTE: diff words
+        let result = diff(
+            &content
+                .new_text
+                .split(" ")
+                .map(|x| x.to_string())
+                .collect::<Vec<String>>(),
+            &content
+                .old_text
+                .split(" ")
+                .map(|x| x.to_string())
+                .collect::<Vec<String>>(),
+        );
 
-    println!();
-
-    print!("{} {} ", 0, 0);
-    for i in new {
-        print!("{} ", i);
-    }
-
-    println!();
-
-    for i in 0..r.len() {
-        if i == 0 {
-            print!("{} ", 0);
-        } else {
-            print!("{} ", &old[i - 1]);
-        }
-
-        for j in 0..r[i].len() {
-            print!("{} ", r[i][j]);
-        }
-
-        println!();
+        println!("diff result: {:?}", result);
+    } else {
+        eprintln!("Application Error.");
     }
 }
