@@ -35,7 +35,7 @@ LCS(Longest Common Sequence)
 
 ## TODO List
 
-1. Using webassembly(maybe [Yew](https://github.com/yewstack/yew)) to display the diff-result.
+* [ ] Using webassembly(maybe [Yew](https://github.com/yewstack/yew)) to display the diff-result.
 
 ## References
 
