@@ -1,5 +1,6 @@
 // TODO:
 // 1. combine diff_chars, diff_words and diff_lines
+// 2. seperate functions or structs into different directories
 // Final goal: function like git-diff
 
 use std::{env, process};
