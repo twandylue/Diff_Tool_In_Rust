@@ -1,26 +1,24 @@
 # Diff Tool In Rust
 
-Find the difference between two documents (like the function of git diff)
+Find the difference between two documents (like the function of git diff).
 
-## Showing diff between two documents
+## Quick Start
 
-### Quick Start
+Prepare two different files to compare the difference between them.
 
-Prepare two files to compare the difference between them.
-
-* In old_text.txt
+* In `old_text.txt`
 
   ```plain
   I am Andy. Here I come.
   ```
 
-* In new_text.txt
+* In `new_text.txt`
 
   ```plain
   I am Amy.
   ```
 
-Then, use it!
+Then, let's go!
 
 ```console
 $ cargo run -- old_file.txt new_file.txt
@@ -29,14 +27,14 @@ New file path: new_text.txt
 diff result: ["I", "am", "-Andy.", "-Here", "-I", "-come.\n", "+Amy.\n"]
 ```
 
-### Algorithm
+## Algorithm
 
 LCS(Longest Common Sequence)
 
-## TODO List
+## TODOs
 
 * [ ] Using webassembly(maybe [Yew](https://github.com/yewstack/yew)) to display the diff-result.
 
 ## References
 
-1. [diffing](https://florian.github.io/diffing/)
+* [diffing](https://florian.github.io/diffing/)
