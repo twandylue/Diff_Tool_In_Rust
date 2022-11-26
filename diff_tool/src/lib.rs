@@ -43,17 +43,7 @@ impl Content {
         })
     }
 
-    pub fn diff_by_chars(&self) -> Vec<String> {
-        let new_text = &self
-            .new_text
-            .chars()
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>();
-        let old_text = &self
-            .old_text
-            .chars()
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>();
+    fn compute(old_text: &Vec<String>, new_text: &Vec<String>) -> Vec<String> {
         let lcs = compute_lcs_matrix_dp(new_text, old_text);
         let mut i = new_text.len();
         let mut j = old_text.len();
@@ -84,6 +74,21 @@ impl Content {
         return result;
     }
 
+    pub fn diff_by_chars(&self) -> Vec<String> {
+        let new_text = &self
+            .new_text
+            .chars()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+        let old_text = &self
+            .old_text
+            .chars()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+
+        return Self::compute(old_text, new_text);
+    }
+
     pub fn diff_by_words(&self) -> Vec<String> {
         let new_text = &self
             .new_text
@@ -95,34 +100,8 @@ impl Content {
             .split(" ")
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
-        let lcs = compute_lcs_matrix_dp(new_text, old_text);
-        let mut i = new_text.len();
-        let mut j = old_text.len();
 
-        let mut result: Vec<String> = Vec::new();
-
-        while i != 0 || j != 0 {
-            if i == 0 {
-                result.push(format!("-{}", old_text[j - 1]));
-                j -= 1;
-            } else if j == 0 {
-                result.push(format!("+{}", new_text[i - 1]));
-                i -= 1;
-            } else if new_text[i - 1] == old_text[j - 1] {
-                result.push(format!("{}", new_text[i - 1]));
-                i -= 1;
-                j -= 1;
-            } else if lcs[j - 1][i] <= lcs[j][i - 1] {
-                result.push(format!("+{}", new_text[i - 1]));
-                i -= 1;
-            } else {
-                result.push(format!("-{}", old_text[j - 1]));
-                j -= 1;
-            }
-        }
-
-        result.reverse();
-        return result;
+        return Self::compute(old_text, new_text);
     }
 }
 
