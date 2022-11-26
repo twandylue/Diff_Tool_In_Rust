@@ -5,7 +5,7 @@
 
 use std::{env, process};
 
-use diff_tool::{compute_lcs_matrix_dp, diff, Config, Content};
+use diff_tool::{Config, Content};
 
 fn main() {
     let config = Config::build(env::args()).unwrap_or_else(|err| {
@@ -19,18 +19,7 @@ fn main() {
     match Content::read(config) {
         Ok(content) => {
             // NOTE: diff words
-            let result = diff(
-                &content
-                    .new_text
-                    .split(" ")
-                    .map(|x| x.to_string())
-                    .collect::<Vec<String>>(),
-                &content
-                    .old_text
-                    .split(" ")
-                    .map(|x| x.to_string())
-                    .collect::<Vec<String>>(),
-            );
+            let result = content.diff_by_words();
 
             println!("diff result: {:?}", result);
         }

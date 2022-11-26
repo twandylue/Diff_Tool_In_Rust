@@ -1,5 +1,5 @@
-use ::std::cmp;
-use std::{error::Error, fmt::Display, fs};
+use std::cmp;
+use std::{error::Error, fs};
 
 pub struct Config {
     pub new_file_path: String,
@@ -42,43 +42,91 @@ impl Content {
             old_text: old_content,
         })
     }
-}
 
-pub fn diff<T>(new_text: &Vec<T>, old_text: &Vec<T>) -> Vec<String>
-where
-    T: Display + PartialEq,
-{
-    let lcs = compute_lcs_matrix_dp(new_text, old_text);
-    let mut i = new_text.len();
-    let mut j = old_text.len();
+    pub fn diff_by_chars(&self) -> Vec<String> {
+        let new_text = &self
+            .new_text
+            .chars()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+        let old_text = &self
+            .old_text
+            .chars()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+        let lcs = compute_lcs_matrix_dp(new_text, old_text);
+        let mut i = new_text.len();
+        let mut j = old_text.len();
 
-    let mut result: Vec<String> = Vec::new();
+        let mut result: Vec<String> = Vec::new();
 
-    while i != 0 || j != 0 {
-        if i == 0 {
-            result.push(format!("-{}", old_text[j - 1]));
-            j -= 1;
-        } else if j == 0 {
-            result.push(format!("+{}", new_text[i - 1]));
-            i -= 1;
-        } else if new_text[i - 1] == old_text[j - 1] {
-            result.push(format!("{}", new_text[i - 1]));
-            i -= 1;
-            j -= 1;
-        } else if lcs[j - 1][i] <= lcs[j][i - 1] {
-            result.push(format!("+{}", new_text[i - 1]));
-            i -= 1;
-        } else {
-            result.push(format!("-{}", old_text[j - 1]));
-            j -= 1;
+        while i != 0 || j != 0 {
+            if i == 0 {
+                result.push(format!("-{}", old_text[j - 1]));
+                j -= 1;
+            } else if j == 0 {
+                result.push(format!("+{}", new_text[i - 1]));
+                i -= 1;
+            } else if new_text[i - 1] == old_text[j - 1] {
+                result.push(format!("{}", new_text[i - 1]));
+                i -= 1;
+                j -= 1;
+            } else if lcs[j - 1][i] <= lcs[j][i - 1] {
+                result.push(format!("+{}", new_text[i - 1]));
+                i -= 1;
+            } else {
+                result.push(format!("-{}", old_text[j - 1]));
+                j -= 1;
+            }
         }
+
+        result.reverse();
+        return result;
     }
 
-    result.reverse();
-    return result;
+    pub fn diff_by_words(&self) -> Vec<String> {
+        let new_text = &self
+            .new_text
+            .split(" ")
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+        let old_text = &self
+            .old_text
+            .split(" ")
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+        let lcs = compute_lcs_matrix_dp(new_text, old_text);
+        let mut i = new_text.len();
+        let mut j = old_text.len();
+
+        let mut result: Vec<String> = Vec::new();
+
+        while i != 0 || j != 0 {
+            if i == 0 {
+                result.push(format!("-{}", old_text[j - 1]));
+                j -= 1;
+            } else if j == 0 {
+                result.push(format!("+{}", new_text[i - 1]));
+                i -= 1;
+            } else if new_text[i - 1] == old_text[j - 1] {
+                result.push(format!("{}", new_text[i - 1]));
+                i -= 1;
+                j -= 1;
+            } else if lcs[j - 1][i] <= lcs[j][i - 1] {
+                result.push(format!("+{}", new_text[i - 1]));
+                i -= 1;
+            } else {
+                result.push(format!("-{}", old_text[j - 1]));
+                j -= 1;
+            }
+        }
+
+        result.reverse();
+        return result;
+    }
 }
 
-pub fn compute_lcs_string_dp(text1: &Vec<char>, text2: &Vec<char>) -> String {
+fn compute_lcs_string_dp(text1: &Vec<char>, text2: &Vec<char>) -> String {
     let mut result = String::new();
     let mut i = text1.len();
     let mut j = text2.len();
@@ -100,7 +148,7 @@ pub fn compute_lcs_string_dp(text1: &Vec<char>, text2: &Vec<char>) -> String {
     return result.chars().rev().collect();
 }
 
-pub fn compute_lcs_matrix_dp<T>(new_text: &Vec<T>, old_text: &Vec<T>) -> Vec<Vec<i32>>
+fn compute_lcs_matrix_dp<T>(new_text: &Vec<T>, old_text: &Vec<T>) -> Vec<Vec<i32>>
 where
     T: PartialEq,
 {
@@ -120,7 +168,7 @@ where
     return result;
 }
 
-pub fn compute_lcs_len_recursive(i: usize, j: usize, text1: &Vec<char>, text2: &Vec<char>) -> u32 {
+fn compute_lcs_len_recursive(i: usize, j: usize, text1: &Vec<char>, text2: &Vec<char>) -> u32 {
     if i == 0 || j == 0 {
         return 0;
     }
@@ -143,86 +191,104 @@ mod tests {
     fn compute_lcs_len_recursive_test() {
         let s1: Vec<char> = String::from("abcd").chars().collect();
         let s2: Vec<char> = String::from("abcd").chars().collect();
-        let r = compute_lcs_len_recursive(s1.len(), s2.len(), &s1, &s2);
-        assert_eq!(r, 4);
+        let actual = compute_lcs_len_recursive(s1.len(), s2.len(), &s1, &s2);
+        assert_eq!(actual, 4);
     }
 
     #[test]
     fn compute_lcs_matrix_dp_test() {
         let s1: Vec<char> = String::from("bdcaba").chars().collect();
         let s2: Vec<char> = String::from("abcbdab").chars().collect();
-        let r = compute_lcs_matrix_dp(&s1, &s2);
+        let actual = compute_lcs_matrix_dp(&s1, &s2);
 
-        assert_eq!(r[0][0], 0);
-        assert_eq!(r.len(), s2.len() + 1);
-        assert_eq!(r[0].len(), s1.len() + 1);
+        assert_eq!(actual[0][0], 0);
+        assert_eq!(actual.len(), s2.len() + 1);
+        assert_eq!(actual[0].len(), s1.len() + 1);
     }
 
     #[test]
     fn compute_lcs_string_dp_test() {
         let s1: Vec<char> = String::from("abcddddd").chars().collect();
         let s2: Vec<char> = String::from("abzdcd").chars().collect();
-        let r = compute_lcs_string_dp(&s1, &s2);
+        let actual = compute_lcs_string_dp(&s1, &s2);
 
-        assert_eq!(r, "abcd");
+        assert_eq!(actual, "abcd");
     }
 
     #[test]
     fn diff_test_chars_1() {
-        let new: Vec<char> = String::from("abcd").chars().collect();
-        let old: Vec<char> = String::from("abc").chars().collect();
-        let r = diff(&new, &old);
+        let new = String::from("abcd");
+        let old = String::from("abc");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
+        let actual = content.diff_by_chars();
 
         let expected = vec!["a", "b", "c", "+d"];
-        for i in 0..r.len() {
-            assert_eq!(r[i], expected[i]);
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
         }
     }
 
     #[test]
     fn diff_test_chars_2() {
-        let new: Vec<char> = String::from("abcd").chars().collect();
-        let old: Vec<char> = String::from("").chars().collect();
-        let r = diff(&new, &old);
+        let new = String::from("abcd");
+        let old = String::from("");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
+        let actual = content.diff_by_chars();
 
         let expected = vec!["+a", "+b", "+c", "+d"];
-        for i in 0..r.len() {
-            assert_eq!(r[i], expected[i]);
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
         }
     }
 
     #[test]
     fn diff_test_chars_3() {
-        let new: Vec<char> = String::from("").chars().collect();
-        let old: Vec<char> = String::from("abcd").chars().collect();
-        let r = diff(&new, &old);
+        let new = String::from("");
+        let old = String::from("abcd");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
+        let actual = content.diff_by_chars();
 
         let expected = vec!["-a", "-b", "-c", "-d"];
-        for i in 0..r.len() {
-            assert_eq!(r[i], expected[i]);
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
         }
     }
 
     #[test]
     fn diff_test_chars_4() {
-        let new: Vec<char> = String::from("abecd").chars().collect();
-        let old: Vec<char> = String::from("zaabck").chars().collect();
-        let r = diff(&new, &old);
+        let new = String::from("abecd");
+        let old = String::from("zaabck");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
+        let actual = content.diff_by_chars();
 
         let expected = vec!["-z", "-a", "a", "b", "+e", "c", "-k", "+d"];
-        for i in 0..r.len() {
-            assert_eq!(r[i], expected[i]);
+        for i in 0..actual.len() {
+            assert_eq!(actual[i], expected[i]);
         }
     }
 
     #[test]
     fn diff_test_words_1() {
-        // let new: Vec<&str> = vec!["He", "is", "Andy"];
-        // let old: Vec<&str> = vec!["She", "is", "Amy"];
-        let new: Vec<&str> = "He is Andy".split(" ").collect();
-        let old: Vec<&str> = "She is Amy".split(" ").collect();
-        let actual = diff(&new, &old);
+        let new = String::from("He is Andy");
+        let old = String::from("She is Amy");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
 
+        let actual = content.diff_by_words();
         let expected = vec!["-She", "+He", "is", "-Amy", "+Andy"];
         for i in 0..actual.len() {
             assert_eq!(actual[i], expected[i]);
@@ -231,10 +297,14 @@ mod tests {
 
     #[test]
     fn diff_test_words_2() {
-        let new: Vec<&str> = "He is Andy".split(" ").collect();
-        let old: Vec<&str> = "He is".split(" ").collect();
-        let actual = diff(&new, &old);
+        let new = String::from("He is Andy");
+        let old = String::from("He is");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
 
+        let actual = content.diff_by_words();
         let expected = vec!["He", "is", "+Andy"];
         for i in 0..actual.len() {
             assert_eq!(actual[i], expected[i]);
@@ -243,10 +313,14 @@ mod tests {
 
     #[test]
     fn diff_test_words_3() {
-        let new: Vec<&str> = "is Andy".split(" ").collect();
-        let old: Vec<&str> = "He is Andy".split(" ").collect();
-        let actual = diff(&new, &old);
+        let new = String::from("is Andy");
+        let old = String::from("He is Andy");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
 
+        let actual = content.diff_by_words();
         let expected = vec!["-He", "is", "Andy"];
         for i in 0..actual.len() {
             assert_eq!(actual[i], expected[i]);
@@ -254,24 +328,37 @@ mod tests {
     }
 
     #[test]
-    fn diff_test_lines_1() {
-        let new: Vec<&str> = vec!["He is Andy", "She is Anne"];
-        let old: Vec<&str> = vec!["He is Andy", "I am Amy"];
-        let actual = diff(&new, &old);
+    fn diff_test_words_4() {
+        let new = String::from("He is Andy She is Anne");
+        let old = String::from("He is Andy I am Amy");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
 
-        let expected = vec!["He is Andy", "-I am Amy", "+She is Anne"];
+        let actual = content.diff_by_words();
+        println!("actual: {:?}", actual);
+        let expected = vec![
+            "He", "is", "Andy", "-I", "-am", "-Amy", "+She", "+is", "+Anne",
+        ];
         for i in 0..actual.len() {
             assert_eq!(actual[i], expected[i]);
         }
     }
 
     #[test]
-    fn diff_test_lines_2() {
-        let new: Vec<&str> = vec!["He is Andy", "I am Amyyy", "She is Anne"];
-        let old: Vec<&str> = vec!["He is Andy", "I am Amy"];
-        let actual = diff(&new, &old);
+    fn diff_test_words_5() {
+        let new = String::from("He is Andy I am Amyyy She is Anne");
+        let old = String::from("He is Andy I am Amy");
+        let content = Content {
+            new_text: new,
+            old_text: old,
+        };
 
-        let expected = vec!["He is Andy", "-I am Amy", "+I am Amyyy", "+She is Anne"];
+        let actual = content.diff_by_words();
+        let expected = vec![
+            "He", "is", "Andy", "I", "am", "-Amy", "+Amyyy", "+She", "+is", "+Anne",
+        ];
         for i in 0..actual.len() {
             assert_eq!(actual[i], expected[i]);
         }
