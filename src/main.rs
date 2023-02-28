@@ -3,28 +3,49 @@
 // 2. separate functions or structs into different directories
 // Final goal: function like git-diff
 
-use std::{env, process};
+use differ::Differ;
+use std::env;
 
-use diff_tool::{Config, Content};
+mod differ;
 
-fn main() {
-    let config = Config::build(env::args()).unwrap_or_else(|err| {
-        eprintln!("Problem parsing arguments: {err}");
-        process::exit(1);
-    });
+fn usage(program: &str) {
+    eprintln!("Usage: {program} <old_file> <new_file>");
+}
 
-    println!("Old file path: {}", config.old_file_path);
-    println!("New file path: {}", config.new_file_path);
+fn main() -> Result<(), ()> {
+    let mut args = env::args();
+    let program = args.next().expect("path to program doesn't be provided.");
+    let old_file = args.next().ok_or_else(|| {
+        usage(&program);
+        eprintln!("ERROR: no old file path is provided.");
+    })?;
 
-    match Content::read(config) {
-        Ok(content) => {
-            // NOTE: diff words
-            let result = content.diff_by_words();
+    let new_file = args.next().ok_or_else(|| {
+        usage(&program);
+        eprintln!("ERROR: no new file path is provided.");
+    })?;
 
-            println!("diff result: {:?}", result);
-        }
-        Err(err) => {
-            eprintln!("Application Error: {err}.");
-        }
-    }
+    println!("Old file path: {old_file}");
+    println!("New file path: {new_file}");
+
+    let old_strings = std::fs::read_to_string(&old_file).map_err(|err| {
+        usage(&program);
+        eprintln!("ERROR: could not read {old_file}: {err}");
+    })?;
+
+    let new_strings = std::fs::read_to_string(&new_file).map_err(|err| {
+        usage(&program);
+        eprintln!("ERROR: could not read {new_file}: {err}");
+    })?;
+
+    let differ = Differ {
+        new_text: new_strings,
+        old_text: old_strings,
+    };
+
+    let result = differ.diff_by_words();
+
+    println!("diff result: {:?}", result);
+
+    Ok(())
 }

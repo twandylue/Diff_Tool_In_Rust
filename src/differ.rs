@@ -1,48 +1,11 @@
 use std::cmp;
-use std::{error::Error, fs};
 
-pub struct Config {
-    pub new_file_path: String,
-    pub old_file_path: String,
-}
-
-impl Config {
-    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
-        args.next();
-
-        let old_file_path = match args.next() {
-            Some(f) => f,
-            None => return Err("Didn't get a old file path."),
-        };
-
-        let new_file_path = match args.next() {
-            Some(f) => f,
-            None => return Err("Didn't get a new file path."),
-        };
-
-        Ok(Config {
-            new_file_path: new_file_path.clone(),
-            old_file_path: old_file_path.clone(),
-        })
-    }
-}
-
-pub struct Content {
+pub struct Differ {
     pub new_text: String,
     pub old_text: String,
 }
 
-impl Content {
-    pub fn read(config: Config) -> Result<Content, Box<dyn Error>> {
-        let old_content = fs::read_to_string(config.old_file_path)?;
-        let new_content = fs::read_to_string(config.new_file_path)?;
-
-        Ok(Content {
-            new_text: new_content,
-            old_text: old_content,
-        })
-    }
-
+impl Differ {
     fn compute(old_text: &Vec<String>, new_text: &Vec<String>) -> Vec<String> {
         let lcs = compute_lcs_matrix_dp(new_text, old_text);
         let mut i = new_text.len();
@@ -198,7 +161,7 @@ mod tests {
     fn diff_test_chars_1() {
         let new = String::from("abcd");
         let old = String::from("abc");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -214,7 +177,7 @@ mod tests {
     fn diff_test_chars_2() {
         let new = String::from("abcd");
         let old = String::from("");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -230,7 +193,7 @@ mod tests {
     fn diff_test_chars_3() {
         let new = String::from("");
         let old = String::from("abcd");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -246,7 +209,7 @@ mod tests {
     fn diff_test_chars_4() {
         let new = String::from("abecd");
         let old = String::from("zaabck");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -262,7 +225,7 @@ mod tests {
     fn diff_test_words_1() {
         let new = String::from("He is Andy");
         let old = String::from("She is Amy");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -278,7 +241,7 @@ mod tests {
     fn diff_test_words_2() {
         let new = String::from("He is Andy");
         let old = String::from("He is");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -294,7 +257,7 @@ mod tests {
     fn diff_test_words_3() {
         let new = String::from("is Andy");
         let old = String::from("He is Andy");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -310,7 +273,7 @@ mod tests {
     fn diff_test_words_4() {
         let new = String::from("He is Andy She is Anne");
         let old = String::from("He is Andy I am Amy");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };
@@ -329,7 +292,7 @@ mod tests {
     fn diff_test_words_5() {
         let new = String::from("He is Andy I am Amyyy She is Anne");
         let old = String::from("He is Andy I am Amy");
-        let content = Content {
+        let content = Differ {
             new_text: new,
             old_text: old,
         };

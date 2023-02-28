@@ -21,9 +21,9 @@ I am Amy.
 Then, let's go!
 
 ```console
-$ cargo run -- old.txt new.txt
-Old file path: old.txt
-New file path: new.txt
+$ cargo run -- ./src/data/old.txt ./src/data/new.txt
+Old file path: ./src/data/old.txt
+New file path: ./src/data/new.txt
 diff result: ["I", "am", "-Andy.", "-Here", "-I", "-come.\n", "+Amy.\n"]
 ```
 
