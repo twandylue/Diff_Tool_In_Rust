@@ -20,11 +20,23 @@ I am Amy.
 
 Then, let's go!
 
+Diff by words
+
 ```console
-$ cargo run -- ./src/data/old.txt ./src/data/new.txt
+$ cargo run -- diff-words ./src/data/old.txt ./src/data/new.txt
 Old file path: ./src/data/old.txt
 New file path: ./src/data/new.txt
-diff result: ["I", "am", "-Andy.", "-Here", "-I", "-come.\n", "+Amy.\n"]
+diff result: ["I", "am", "-Andy.", "-Here", "-I", "-come.\r\n", "+Amy.\r\n"]
+```
+
+Diff by chars
+
+```console
+$ cargo run -- diff-chars ./src/data/old.txt ./src/data/new.txt
+Old file path: ./src/data/old.txt
+New file path: ./src/data/new.txt
+diff result: ["I", " ", "a", "m", " ", "A", "-n", "-d", "-y", "-.", "- ", "-H", "-e", "-r", "-e", "- ", "-I", "- ", "-c", "-o", 
+"m", "-e", "+y", ".", "\r", "\n"]
 ```
 
 ## Algorithm
