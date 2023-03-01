@@ -12,10 +12,10 @@ use std::{
 mod differ;
 
 fn usage(program: &str) {
-    eprintln!("Usage: {program} [SBUCOMMAND] <old_file> <new_file>");
+    eprintln!("Usage: {program} [SBUCOMMAND] [OPTIONS]");
     eprintln!("Subcommands:");
-    eprintln!("     diff-words              find the difference by words between the files.");
-    eprintln!("     diff-chars              find the difference by chars between the files.");
+    eprintln!("     diff-words <old_file> <new_file>         find the difference by words between the files.");
+    eprintln!("     diff-chars <old_file> <new_file>         find the difference by chars between the files.");
 }
 
 fn read_files(args: &mut Args, program: &str) -> Result<(String, String), ()> {

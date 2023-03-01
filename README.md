@@ -6,6 +6,16 @@ Find and show the difference between two documents (like the function of git dif
 
 Prepare two different files(`*.txt`) to compare the difference between them.
 
+For help
+
+```console
+$ cargo run -- help
+Usage: target/debug/diff_tool [SBUCOMMAND] [OPTIONS]
+Subcommands:
+     diff-words <old_file> <new_file>          find the difference by words between the files.
+     diff-chars <old_file> <new_file>          find the difference by chars between the files.
+```
+
 In `old.txt`
 
 ```plain
