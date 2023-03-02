@@ -74,14 +74,14 @@ fn compute_lcs_string_dp(old_text: &Vec<char>, new_text: &Vec<char>) -> String {
     let mut i = old_text.len();
     let mut j = new_text.len();
 
-    let lcs = compute_lcs_matrix_dp(old_text, new_text);
+    let dp = compute_lcs_matrix_dp(old_text, new_text);
 
     while i != 0 && j != 0 {
         if old_text[i - 1] == new_text[j - 1] {
             result.push(old_text[i - 1]);
             i -= 1;
             j -= 1;
-        } else if lcs[j - 1][i] <= lcs[j][i - 1] {
+        } else if dp[j - 1][i] <= dp[j][i - 1] {
             i -= 1;
         } else {
             j -= 1;
@@ -95,20 +95,20 @@ fn compute_lcs_matrix_dp<T>(new_text: &Vec<T>, old_text: &Vec<T>) -> Vec<Vec<i32
 where
     T: PartialEq,
 {
-    let mut result = vec![vec![0; new_text.len() + 1]; old_text.len() + 1];
+    let mut dp = vec![vec![0; new_text.len() + 1]; old_text.len() + 1];
     for i in 0..old_text.len() + 1 {
         for j in 0..new_text.len() + 1 {
             if i == 0 || j == 0 {
-                result[i][j] = 0;
+                dp[i][j] = 0;
             } else if old_text[i - 1] == new_text[j - 1] {
-                result[i][j] = result[i - 1][j - 1] + 1
+                dp[i][j] = dp[i - 1][j - 1] + 1
             } else {
-                result[i][j] = cmp::max(result[i - 1][j], result[i][j - 1])
+                dp[i][j] = cmp::max(dp[i - 1][j], dp[i][j - 1])
             }
         }
     }
 
-    return result;
+    return dp;
 }
 
 fn compute_lcs_len_recursive(i: usize, j: usize, old_text: &[char], new_text: &[char]) -> u32 {
