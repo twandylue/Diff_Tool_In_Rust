@@ -6,7 +6,7 @@ pub struct Differ {
 }
 
 impl Differ {
-    fn compute(old_text: &Vec<String>, new_text: &Vec<String>) -> Vec<String> {
+    fn compute_lcs(old_text: &Vec<String>, new_text: &Vec<String>) -> Vec<String> {
         let lcs = compute_lcs_matrix_dp(new_text, old_text);
         let mut i = new_text.len();
         let mut j = old_text.len();
@@ -49,7 +49,7 @@ impl Differ {
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
 
-        return Self::compute(&old_text, &new_text);
+        return Self::compute_lcs(&old_text, &new_text);
     }
 
     pub fn diff_by_words(&self) -> Vec<String> {
@@ -65,7 +65,7 @@ impl Differ {
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
 
-        return Self::compute(&old_text, &new_text);
+        return Self::compute_lcs(&old_text, &new_text);
     }
 }
 
