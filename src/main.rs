@@ -68,15 +68,17 @@ fn entry() -> Result<(), ()> {
 
     match subcommand.as_str() {
         "diff-words" => {
-            let result = differ.diff_by_words();
+            // let result = differ.diff_by_words();
 
-            println!("diff result: {:?}", result);
+            // println!("diff result: {:?}", result);
+            todo!();
         }
 
         "diff-chars" => {
-            let result = differ.diff_by_chars();
-
-            println!("diff result: {:?}", result);
+            // let result = differ.diff_by_chars();
+            //
+            // println!("diff result: {:?}", result);
+            todo!();
         }
         _ => {
             eprintln!("ERROR: unknown subcommand {subcommand}");
