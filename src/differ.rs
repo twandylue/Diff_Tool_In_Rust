@@ -100,30 +100,31 @@ impl Differ {
         return table;
     }
 
-    fn diff_by_lcs(text1: &String, text2: &String) -> Vec<(char, usize, char)> {
-        let c1 = text1.chars().collect::<Vec<char>>();
-        let c2 = text2.chars().collect::<Vec<char>>();
-        let mut n = c1.len();
-        let mut m = c2.len();
-        let table = Self::compute_lcs_table(&c1, &c2);
+    fn diff_by_lcs<T>(text1: &Vec<T>, text2: &Vec<T>) -> Vec<(char, usize, T)>
+    where
+        T: PartialEq + Copy + Clone,
+    {
+        let mut n = text1.len();
+        let mut m = text2.len();
+        let table = Self::compute_lcs_table(text1, text2);
 
-        let mut patch: Vec<(char, usize, char)> = Vec::new();
+        let mut patch: Vec<(char, usize, T)> = Vec::new();
 
         while n != 0 || m != 0 {
             if n == 0 {
-                patch.push(('+', m - 1, c2[m - 1]));
+                patch.push(('+', m - 1, text2[m - 1]));
                 m -= 1;
             } else if m == 0 {
-                patch.push(('-', n - 1, c1[n - 1]));
+                patch.push(('-', n - 1, text1[n - 1]));
                 n -= 1;
-            } else if c1[n - 1] == c2[m - 1] {
+            } else if text1[n - 1] == text2[m - 1] {
                 n -= 1;
                 m -= 1;
             } else if table[n - 1][m] <= table[n][m - 1] {
-                patch.push(('+', m - 1, c2[m - 1]));
+                patch.push(('+', m - 1, text2[m - 1]));
                 m -= 1;
             } else if table[n - 1][m] >= table[n][m - 1] {
-                patch.push(('-', n - 1, c1[n - 1]));
+                patch.push(('-', n - 1, text1[n - 1]));
                 n -= 1;
             } else {
                 unreachable!("Can't be here");
@@ -366,7 +367,7 @@ mod tests {
         let expected = vec![('+', 2, 'y')];
 
         // act
-        let actual = Differ::diff_by_lcs(&text1, &text2);
+        let actual = Differ::diff_by_lcs(&text1.chars().collect(), &text2.chars().collect());
 
         // assert
         assert_eq!(expected, actual);
@@ -380,7 +381,7 @@ mod tests {
         let expected: Vec<(char, usize, char)> = Vec::new();
 
         // act
-        let actual = Differ::diff_by_lcs(&text1, &text2);
+        let actual = Differ::diff_by_lcs(&text1.chars().collect(), &text2.chars().collect());
 
         // assert
         assert_eq!(expected, actual);
@@ -394,7 +395,7 @@ mod tests {
         let expected: Vec<(char, usize, char)> = vec![('-', 3, 'y')];
 
         // act
-        let actual = Differ::diff_by_lcs(&text1, &text2);
+        let actual = Differ::diff_by_lcs(&text1.chars().collect(), &text2.chars().collect());
 
         // assert
         assert_eq!(expected, actual);
@@ -408,7 +409,7 @@ mod tests {
         let expected: Vec<(char, usize, char)> = vec![('-', 0, 'y')];
 
         // act
-        let actual = Differ::diff_by_lcs(&text1, &text2);
+        let actual = Differ::diff_by_lcs(&text1.chars().collect(), &text2.chars().collect());
 
         // assert
         assert_eq!(expected, actual);
@@ -429,7 +430,7 @@ mod tests {
         ];
 
         // act
-        let actual = Differ::diff_by_lcs(&text1, &text2);
+        let actual = Differ::diff_by_lcs(&text1.chars().collect(), &text2.chars().collect());
 
         // assert
         assert_eq!(expected, actual);
